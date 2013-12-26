@@ -20,7 +20,7 @@ class Module
 		$sharedEvents = $moduleManager->getEventManager()->getSharedManager();
 
 		$sharedEvents->attach('Zend\Mvc\Controller\AbstractRestfulController', MvcEvent::EVENT_DISPATCH, array($this, 'postProcess'), -100);
-		$sharedEvents->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this, 'errorProcess'), 999);
+		$sharedEvents->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this, 'errorProcess'), -999);
 	}
 
 	/**
@@ -91,6 +91,9 @@ class Module
 	 */
 	public function errorProcess(MvcEvent $e)
 	{
+		$header = $e->getApplication()->getRequest()->getHeader('Accept');
+		if($header->match('text/html'))
+			return null;
 		/** @var \Zend\Di\Di $di */
 		$di = $e->getApplication()->getServiceManager()->get('di');
 
